@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
       - name: Install Dependencies
@@ -27,7 +27,7 @@ jobs:
         run: cargo test --verbose
 
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: "Dioxus Deploy"
         uses: davidMcneil/dioxus-deploy-action@c0c390be1298b58e8b47850cf1e85c3fcf13772c
