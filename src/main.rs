@@ -34,7 +34,7 @@ fn App() -> Element {
     let private_token = use_signal(|| private_token);
     let mut query_expanded = use_signal(|| true);
     // TODO: on input update the `query` and`domains` signals dynamically
-    let query = use_signal(|| MergeRequestsQuery {
+    let mut query = use_signal(|| MergeRequestsQuery {
         created_after: None,
         created_before: None,
         order_by: OrderBy::default(),
@@ -171,10 +171,23 @@ fn App() -> Element {
                             oninput: move |_event| { todo!() }
                         }
                         label { class: "block", "Wip" }
-                        input {
-                            r#type: "text",
+                        select {
                             class: "block p-1 border rounded-sm border-gray-300 bg-gray-100 text-xs text-ariel",
-                            oninput: move |_event| { todo!() }
+                            onchange: move |event| {
+                                (*query.write()).wip = serde_json::from_str::<api::Wip>(&format!("\"{}\"", event.value())).ok();
+                            },
+                            option {
+                                value: "",
+                                ""
+                            },
+                            option {
+                                value: "yes",
+                                "yes"
+                            },
+                            option {
+                                value: "no",
+                                "no"
+                            }
                         }
                     }
                 }
