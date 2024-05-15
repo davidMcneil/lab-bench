@@ -232,7 +232,7 @@ async fn fetch_merge_requests_helper(
     query: &MergeRequestsQuery,
     domain: &MergeRequestsDomain,
 ) -> Result<Vec<MergeRequest>> {
-    info!("fetching merge requests");
+    info!("fetching merge requests with query {:?}", query);
 
     let request = client();
 
