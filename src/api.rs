@@ -233,6 +233,7 @@ async fn fetch_merge_requests_helper(
     domain: &MergeRequestsDomain,
 ) -> Result<Vec<MergeRequest>> {
     info!("fetching merge requests with query {:?}", query);
+    info!("domain {:?}", domain);
 
     let request = client();
 
@@ -285,7 +286,6 @@ async fn fetch_merge_request(
     merge_request: &MergeRequest,
 ) -> Result<MergeRequest> {
     let full = &merge_request.references.full;
-    info!("fetching merge request {full}");
 
     let project_id = merge_request.project_id;
     let merge_request_iid = merge_request.iid;
@@ -309,7 +309,6 @@ async fn fetch_merge_request(
         ));
     };
 
-    info!("fetched merge request {full}");
     Ok(merge_request)
 }
 

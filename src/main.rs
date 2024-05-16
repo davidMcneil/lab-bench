@@ -45,12 +45,8 @@ fn App() -> Element {
         updated_before: None,
         wip: None,
     });
-    let domains = use_signal(|| {
-        vec![
-            MergeRequestsDomain::AuthorUsername("heirecka".into()),
-            MergeRequestsDomain::ProjectPath("inkscape/inkscape".into()),
-        ]
-    });
+    let mut author_domains = use_signal(|| {vec![]});
+    let mut project_domains = use_signal(|| {vec![]});
 
     // Outputs
     let mut merge_requests_result = use_signal(|| Ok::<_, String>(Vec::new()));
@@ -79,12 +75,14 @@ fn App() -> Element {
                         prevent_default: "onclick",
                         onclick: move |_event| {
                             spawn(async move {
+                                let mut domains = author_domains();
+                                domains.append(&mut project_domains().clone());
                                 *merge_requests_result
                                     .write() = fetch_merge_requests(
                                         gitlab_url(),
                                         private_token(),
                                         &query(),
-                                        &domains(),
+                                        &domains,
                                     )
                                     .await
                                     .map_err(|e| e.to_string());
@@ -142,13 +140,17 @@ fn App() -> Element {
                         input {
                             r#type: "text",
                             class: "block p-1 border rounded-sm border-gray-300 bg-gray-100 text-xs text-ariel",
-                            oninput: move |_event| { todo!() }
+                            oninput: move |event| {
+                                *project_domains.write() = event.value().split_whitespace().map(|x| MergeRequestsDomain::ProjectPath(x.to_string())).collect();
+                            }
                         }
                         label { class: "block", "Authors" }
                         input {
                             r#type: "text",
                             class: "block p-1 border rounded-sm border-gray-300 bg-gray-100 text-xs text-ariel",
-                            oninput: move |_event| { todo!() }
+                            oninput: move |event| {
+                                *author_domains.write() = event.value().split_whitespace().map(|x| MergeRequestsDomain::AuthorUsername(x.to_string())).collect();
+                            }
                         }
                     }
                     div { class: "flex flex-row",
