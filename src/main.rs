@@ -9,6 +9,7 @@ use dioxus_free_icons::icons::fa_solid_icons::{
 use dioxus_free_icons::Icon;
 use timeago::Formatter;
 use tracing::{info, Level};
+use strum::IntoEnumIterator;
 
 use crate::api::{
     fetch_merge_requests, fetch_merge_requests_with_full_data, MergeRequest, MergeRequestsDomain,
@@ -155,40 +156,63 @@ fn App() -> Element {
                     }
                     div { class: "flex flex-row",
                         label { class: "block", "Sort" }
-                        input {
-                            r#type: "text",
-                            class: "block p-1 border rounded-sm border-gray-300 bg-gray-100 text-xs text-ariel",
-                            oninput: move |_event| { todo!() }
-                        }
-                        label { class: "block", "Order By" }
-                        input {
-                            r#type: "text",
-                            class: "block p-1 border rounded-sm border-gray-300 bg-gray-100 text-xs text-ariel",
-                            oninput: move |_event| { todo!() }
-                        }
-                        label { class: "block", "State" }
-                        input {
-                            r#type: "text",
-                            class: "block p-1 border rounded-sm border-gray-300 bg-gray-100 text-xs text-ariel",
-                            oninput: move |_event| { todo!() }
-                        }
-                        label { class: "block", "Wip" }
                         select {
                             class: "block p-1 border rounded-sm border-gray-300 bg-gray-100 text-xs text-ariel",
                             onchange: move |event| {
-                                (*query.write()).wip = serde_json::from_str::<api::Wip>(&format!("\"{}\"", event.value())).ok();
+                                (*query.write()).sort = serde_json::from_str(&event.value()).unwrap();
+                            },
+                            for x in api::Sort::iter() {
+                                option {
+                                    value: serde_json::to_string(&x).unwrap(),
+                                    {remove_first_and_last_chars(&serde_json::to_string(&x).unwrap())}
+                                }
+                            }
+                        }
+                        label { class: "block", "Order By" }
+                        select {
+                            class: "block p-1 border rounded-sm border-gray-300 bg-gray-100 text-xs text-ariel",
+                            onchange: move |event| {
+                                (*query.write()).order_by = serde_json::from_str(&event.value()).unwrap();
+                            },
+                            for x in api::OrderBy::iter() {
+                                option {
+                                    value: serde_json::to_string(&x).unwrap(),
+                                    {remove_first_and_last_chars(&serde_json::to_string(&x).unwrap())}
+                                }
+                            }
+                        }
+                        label { class: "block", "State" }
+                        select {
+                            class: "block p-1 border rounded-sm border-gray-300 bg-gray-100 text-xs text-ariel",
+                            onchange: move |event| {
+                                (*query.write()).state = serde_json::from_str(&event.value()).ok();
                             },
                             option {
                                 value: "",
                                 ""
                             },
-                            option {
-                                value: "yes",
-                                "yes"
+                            for x in api::State::iter() {
+                                option {
+                                    value: serde_json::to_string(&x).unwrap(),
+                                    {remove_first_and_last_chars(&serde_json::to_string(&x).unwrap())}
+                                }
+                            }
+                        }
+                        label { class: "block", "Wip" }
+                        select {
+                            class: "block p-1 border rounded-sm border-gray-300 bg-gray-100 text-xs text-ariel",
+                            onchange: move |event| {
+                                (*query.write()).wip = serde_json::from_str(&event.value()).ok();
                             },
                             option {
-                                value: "no",
-                                "no"
+                                value: "",
+                                ""
+                            },
+                            for x in api::Wip::iter() {
+                                option {
+                                    value: serde_json::to_string(&x).unwrap(),
+                                    {remove_first_and_last_chars(&serde_json::to_string(&x).unwrap())}
+                                }
                             }
                         }
                     }
@@ -201,6 +225,10 @@ fn App() -> Element {
             }
         }
     }
+}
+
+fn remove_first_and_last_chars(s: &str) -> &str {
+    &s[1..s.len() - 1]
 }
 
 #[component]

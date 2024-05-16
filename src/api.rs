@@ -6,10 +6,10 @@ use futures::future::join_all;
 use percent_encoding::NON_ALPHANUMERIC;
 use reqwest::Client;
 use serde::{Deserialize, Deserializer, Serialize};
-use strum::Display;
+use strum::{Display, EnumIter};
 use tracing::{error, info};
 
-#[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq, Eq, EnumIter)]
 #[serde(rename_all = "snake_case")]
 pub enum OrderBy {
     #[default]
@@ -18,12 +18,12 @@ pub enum OrderBy {
     Title,
 }
 
-#[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq, Eq, EnumIter)]
 #[serde(rename_all = "snake_case")]
 pub enum Sort {
-    Asc,
     #[default]
     Desc,
+    Asc,
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq, Eq)]
@@ -35,7 +35,7 @@ pub enum Scope {
     All,
 }
 
-#[derive(Clone, Copy, Debug, Default, Display, Deserialize, Serialize, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Default, Display, Deserialize, Serialize, PartialEq, Eq, EnumIter)]
 #[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "snake_case")]
 pub enum State {
@@ -47,7 +47,7 @@ pub enum State {
     Unknown,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq, EnumIter)]
 #[serde(rename_all = "snake_case")]
 pub enum Wip {
     Yes,
