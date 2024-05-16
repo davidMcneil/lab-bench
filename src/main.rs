@@ -27,12 +27,12 @@ fn main() {
 fn App() -> Element {
     info!("lab-bench 9");
 
-    let gitlab_url = "https://gitlab.com/api/v4";
-    let private_token = "";
+    let initial_gitlab_url = "https://gitlab.com/api/v4";
+    let initial_private_token = "";
 
     // Inputs
-    let gitlab_url = use_signal(|| gitlab_url);
-    let private_token = use_signal(|| private_token);
+    let mut gitlab_url = use_signal(|| initial_gitlab_url.to_string());
+    let mut private_token = use_signal(|| initial_private_token.to_string());
     let mut query_expanded = use_signal(|| true);
     // TODO: on input update the `query` and`domains` signals dynamically
     let mut query = use_signal(|| MergeRequestsQuery {
@@ -80,8 +80,8 @@ fn App() -> Element {
                                 domains.append(&mut project_domains().clone());
                                 *merge_requests_result
                                     .write() = fetch_merge_requests(
-                                        gitlab_url(),
-                                        private_token(),
+                                        &gitlab_url(),
+                                        &private_token(),
                                         &query(),
                                         &domains,
                                     )
@@ -90,8 +90,8 @@ fn App() -> Element {
                                 if let Ok(merge_requests) = merge_requests_result() {
                                     *merge_requests_result
                                         .write() = fetch_merge_requests_with_full_data(
-                                            gitlab_url(),
-                                            private_token(),
+                                            &gitlab_url(),
+                                            &private_token(),
                                             &merge_requests,
                                         )
                                         .await
@@ -112,13 +112,19 @@ fn App() -> Element {
                         input {
                             r#type: "text",
                             class: "block p-1 border rounded-sm border-gray-300 bg-gray-100 text-xs text-ariel",
-                            oninput: move |_event| { todo!() }
+                            value: initial_gitlab_url,
+                            oninput: move |event| {
+                                *gitlab_url.write() = event.value();
+                            }
                         }
                         label { class: "block", "Private Token" }
                         input {
                             r#type: "password",
                             class: "block p-1 border rounded-sm border-gray-300 bg-gray-100 text-xs text-ariel",
-                            oninput: move |_event| { todo!() }
+                            value: initial_private_token,
+                            oninput: move |event| {
+                                *private_token.write() = event.value();
+                            }
                         }
                     }
                     div { class: "flex flex-row",
@@ -175,6 +181,19 @@ fn App() -> Element {
                                 (*query.write()).order_by = serde_json::from_str(&event.value()).unwrap();
                             },
                             for x in api::OrderBy::iter() {
+                                option {
+                                    value: serde_json::to_string(&x).unwrap(),
+                                    {remove_first_and_last_chars(&serde_json::to_string(&x).unwrap())}
+                                }
+                            }
+                        }
+                        label { class: "block", "Scope" }
+                        select {
+                            class: "block p-1 border rounded-sm border-gray-300 bg-gray-100 text-xs text-ariel",
+                            onchange: move |event| {
+                                (*query.write()).scope = serde_json::from_str(&event.value()).unwrap();
+                            },
+                            for x in api::Scope::iter() {
                                 option {
                                     value: serde_json::to_string(&x).unwrap(),
                                     {remove_first_and_last_chars(&serde_json::to_string(&x).unwrap())}

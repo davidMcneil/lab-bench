@@ -26,13 +26,13 @@ pub enum Sort {
     Asc,
 }
 
-#[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq, Eq, EnumIter)]
 #[serde(rename_all = "snake_case")]
 pub enum Scope {
     #[default]
+    All,
     CreatedByMe,
     AssignedToMe,
-    All,
 }
 
 #[derive(Clone, Copy, Debug, Default, Display, Deserialize, Serialize, PartialEq, Eq, EnumIter)]
